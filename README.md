@@ -33,6 +33,45 @@ To write a yacc program to recognize a valid arithmetic expression that uses ope
 int yywrap() {
     return 1;  // End of input signal
 }
+
+%{
+#include <stdio.h>
+int yylex(void);
+void yyerror(const char *s);
+%}
+
+%token ID PLUS MINUS MULTIPLICATION DIVISION
+
+%%
+statement: ID '=' E {
+    printf("\nValid arithmetic expression\n");
+    $$ = $3;
+}
+;
+
+E: E PLUS ID
+ | E MINUS ID
+ | E MULTIPLICATION ID
+ | E DIVISION ID
+ | ID
+;
+
+%%
+
+extern FILE* yyin;
+
+int main() {
+    yyin = stdin;
+    do {
+        yyparse();
+    } while (!feof(yyin));
+    return 0;
+}
+
+void yyerror(const char *s) {
+    fprintf(stderr, "Error: %s\n", s);
+}
+
 ```
 # OUTPUT
 ![image](https://github.com/user-attachments/assets/9a5607d4-54f6-42f8-a9df-860bccc1deb9)
